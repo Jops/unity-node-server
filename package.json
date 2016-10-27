@@ -1,0 +1,30 @@
+{
+  "name": "unity-node-server",
+  "version": "1.0.0",
+  "description": "Nodejs socket server for unity client and nodejs clients",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jops/unity-node-server.git"
+  },
+  "keywords": [
+    "nodejs",
+    "socket.io",
+    "unity"
+  ],
+  "author": "Jonathan HW Halkett",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jops/unity-node-server/issues"
+  },
+  "homepage": "https://github.com/Jops/unity-node-server#readme",
+  "dependencies": {
+    "config": "^1.21.0",
+    "express": "^4.14.0",
+    "socket.io": "^1.5.1"
+  }
+}
