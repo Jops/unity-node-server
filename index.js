@@ -4,12 +4,13 @@ var app = require('express')(),
     config = require('config'),
     port = process.argv[2] || config.port,
     passwords = config.validPasswords,
-    roles = config.roles,
     commandList = {
         captain: require('./roles/captain')
     },
     trace = function(msg) {console.log(msg);},
+    clientMsg = require('./helpers/clientMsg'),
     clients = {},
+    roleCall = {},
     ConnectionList = {
         unity: false,
         captain: false,
@@ -22,6 +23,9 @@ var app = require('express')(),
     timeout = config.sendTimeout,
     interval;
 
+/**
+ *  WEBVIEW
+ */
 app.get('/', function( req, res ) {
     res.send(
         '<h1>Gazpacho Server</h1>' +
@@ -36,6 +40,9 @@ app.get('/', function( req, res ) {
     );
 });
 
+/**
+ *  IO SETUP EVENTS
+ */
 io.on('connection', function( socket ) {
     trace('a user connected: ' + socket.id);
 
@@ -51,17 +58,16 @@ io.on('connection', function( socket ) {
         var identity = identifyClient( data.pw );
 
         clients[socket.id].identity = identity;
+        roleCall[identity] = socket.id;
         ConnectionList[identity] = true;
+
         trace('Identifying client: ' + socket.id + ' as ' + identity);
-        sendMessage( socket.id, 'Identified as ' + identity );
+        sendMessage( socket.id, clientMsg( 'init', 'Identified as ' + identity ) );
     });
 
     // from crew
     socket.on('command', function( data ) {
-        for( var i = data.length - 1; i >= 0; i-- )
-        {
-            commands( socket.id, data[i] );
-        }
+        for( var i = data.length - 1; i >= 0; i-- ) commands( socket.id, data[i] );
     });
 
     // from unity
@@ -70,23 +76,66 @@ io.on('connection', function( socket ) {
     });
 });
 
+/**
+ *  EXPRESS START
+ */
 http.listen(port, function() {
     trace('listening on *:' + port);
+
+    // START IO SENDING MESSAGES
+    interval = setInterval( DO, timeout );
 });
 
+/**
+ *  FROM COMMANDERS
+ */
 function commands( id, data )
 {
-    var cmd = roles[ clients[ id ].identity ][ data.e ];
-    if( cmd === undefined ) sendMessage( id, 'command unknown: ' + data.e );
+    var identity = clients[ id ].identity,
+        ioEvent = data.e,
+        cmd = getCommandByRole( ioEvent, identity ),
+        res;
+
+    if( cmd === undefined )
+        sendMessage(
+            id,
+            clientMsg( 'server-info', 'command unknown: ' + ioEvent )
+        );
     else
     {
-        sendMessage( id, commandList[ clients[ id ].identity ][data.e](data.d) );
+        res = cmd( data.d );
+        if( res )
+            sendMessage(
+                roleCall[ res.intended ],
+                res.message
+            );
     }
 }
 
-function info( socket, data )
+/**
+ *  FROM SHIP
+ */
+function info( id, data )
 {
-    trace( 'from unity: ' + JSON.stringify( data ) );
+    // send relevant info to each client by role.
+    for( var clientId in clients )
+    {
+        if( clientId !== id )
+            sendMessage(
+                id,
+                clientMsg(
+                    'ship-info',
+                    commandList[ clients[ id ].identity ].buildClientInfo( data )
+                )
+            );
+    }
+}
+
+// PRIVATE FUNCTIONS
+
+function getCommandByRole( name, role )
+{
+    return commandList[ role ][ name ];
 }
 
 function identifyClient( password )
@@ -98,7 +147,7 @@ function identifyClient( password )
     return 'UNIDENTIFIED';
 }
 
-function sendMessage(id, msg)
+function sendMessage( id, msg )
 {
     messages.push(
         {
@@ -117,5 +166,3 @@ function DO()
     }
     messages = [];
 }
-
-interval = setInterval( DO, timeout );

@@ -8,17 +8,5 @@
 		"engineer": "scotty",
 		"gunner": "triggerhappy"
 	},
-	"sendTimeout": "46",
-	"roles": {
-		"captain": {
-			"command-list": {
-				"params": "",
-				"response": "{JSON} command descriptions."
-			},
-			"do-captiony-stuff": {
-				"params": "{string} foo, {string} bar",
-				"response": "{ message: nothing, at all }"
-			}
-		}
-	}
+	"sendTimeout": "46"
 }
