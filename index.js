@@ -29,13 +29,13 @@ var app = require('express')(),
 app.get('/', function( req, res ) {
     res.send(
         '<h1>Gazpacho Server</h1>' +
-        '<p>Simulation connected: '+ ConnectionList.unity +'</p>' +
+        '<p>Simulation connected: <font color="'+ (ConnectionList.unity?'green':'red') +'">'+ ConnectionList.unity +'</font></p>' +
         '<ul>' +
-            '<li>Captain connected: '+ ConnectionList.captain +'</li>' +
-            '<li>Logistics Officer connected: '+ ConnectionList.logistics +'</li>' +
-            '<li>Helmsman connected: '+ ConnectionList.helmsman +'</li>' +
-            '<li>Engineer connected: '+ ConnectionList.engineer +'</li>' +
-            '<li>Gunner connected: '+ ConnectionList.gunner +'</li>' +
+            '<li>Captain connected: <font color="'+ (ConnectionList.captain?'green':'red') +'">'+ ConnectionList.captain +'</font></li>' +
+            '<li>Logistics Officer connected: <font color="'+ (ConnectionList.logistics?'green':'red') +'">'+ ConnectionList.logistics +'</font></li>' +
+            '<li>Helmsman connected: <font color="'+ (ConnectionList.helmsman?'green':'red') +'">'+ ConnectionList.helmsman +'</font></li>' +
+            '<li>Engineer connected: <font color="'+ (ConnectionList.engineer?'green':'red') +'">'+ ConnectionList.engineer +'</font></li>' +
+            '<li>Gunner connected: <font color="'+ (ConnectionList.gunner?'green':'red') +'">'+ ConnectionList.gunner +'</font></li>' +
         '</ul>'
     );
 });
