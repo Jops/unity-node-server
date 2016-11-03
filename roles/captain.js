@@ -15,6 +15,13 @@ var info = {
 		}
 	};
 
+function infoBuilder( info )
+{
+	return {
+		captainsIssues: 'some info.'
+	};
+}
+
 module.exports =
 {
 	'command-info': function( data )
@@ -28,10 +35,5 @@ module.exports =
 	},
 
 	// server specific command
-	buildClientInfo: function( info )
-	{
-		return {
-			captainsIssues: 'some info.'
-		};
-	}
+	buildClientInfo: infoBuilder
 };
